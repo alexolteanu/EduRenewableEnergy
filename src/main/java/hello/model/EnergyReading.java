@@ -23,6 +23,10 @@ public class EnergyReading {
         this.value = value;
     }
 
+    public EnergyReading(){
+
+    }
+
     public WindTurbine getWindTurbine() {
         return windTurbine;
     }
