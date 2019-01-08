@@ -22,22 +22,29 @@
 <script th:inline="javascript">
 /*<![CDATA[*/
 
-    // get info
-    markerName = /*[[${windTurbines[0].name}]]*/ 'default'
-    markerLat = /*[[${windTurbines[0].latitude}]]*/ 'default'
-    markerLon = /*[[${windTurbines[0].longitude}]]*/ 'default'
-
     // initialize map
-    map = L.map('mapDiv').setView([markerLat, markerLon], 7);
+    map = L.map('mapDiv').setView([45.9443, 25.0094], 7);
     // set map tiles source
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
       maxZoom: 18,
     }).addTo(map);
-    // add marker to the map
-    marker = L.marker([markerLat, markerLon]).addTo(map);
-    // add popup to the marker
-    marker.bindPopup("<b>"+markerName+"</b><br />YTD Power: TBD").openPopup();
+
+
+    /*[# th:each="windTurbine : ${windTurbines}"]*/
+
+        // get info
+        markerName = /*[[${windTurbine.name}]]*/ 'default'
+        markerLat = /*[[${windTurbine.latitude}]]*/ '0.0'
+        markerLon = /*[[${windTurbine.longitude}]]*/ '0.0'
+        markerVal = /*[[${windTurbine.value}]]*/ '0.0'
+
+        // add marker to the map
+        marker = L.marker([markerLat, markerLon]).addTo(map);
+        // add popup to the marker
+        marker.bindPopup("<b>"+markerName+"</b><br />Total energy: "+markerVal).openPopup();
+
+    /*[/]*/
 
 /*]]>*/
 </script>

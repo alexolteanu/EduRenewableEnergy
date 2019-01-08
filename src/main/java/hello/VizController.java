@@ -16,7 +16,7 @@ public class VizController {
 
     @GetMapping("/map")
     public String map(Model model) {
-        model.addAttribute("windTurbines", windTurbineRepository.findAll());
+        model.addAttribute("windTurbines", windTurbineRepository.findAllWithAggregatedEnergy());
         return "map";
     }
 

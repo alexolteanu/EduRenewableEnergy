@@ -14,7 +14,7 @@ import java.util.List;
 /*
  *  POST    http://localhost:8080/demo/add      body: name=CK400, latitude=43.87, longitude=28.38
  *  GET     http://localhost:8080/demo/all
- *  POST    http://localhost:8080/demo/data     body: windTurbineId=1, time=2019-01-01%2015:30:00.0, value=300
+ *  POST    http://localhost:8080/demo/data     body: windTurbineName=CK400, time=2019-01-01%2015:30:00.0, value=300
  *  GET     http://localhost:8080/demo/data
  */
 
