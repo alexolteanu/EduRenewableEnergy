@@ -31,5 +31,7 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter-data-jpa'
     // Use MySQL Connector-J
     compile 'mysql:mysql-connector-java'
+    compile("org.springframework.boot:spring-boot-starter-thymeleaf")
+    compile("org.springframework.boot:spring-boot-devtools")
     testCompile("junit:junit")
 }
