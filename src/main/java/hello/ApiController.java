@@ -1,13 +1,14 @@
 package hello;
 
-import hello.model.EnergyReading;
-import hello.model.EnergyReadingRepository;
-import hello.model.WindTurbine;
-import hello.model.WindTurbineRepository;
+import hello.model.*;
+import hello.service.TurbineServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.websocket.server.PathParam;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -20,7 +21,7 @@ import java.util.List;
 
 
 @Controller    // This means that this class is a Controller
-@RequestMapping(path="/demo") // This means URL's start with /demo (after Application path)
+@RequestMapping(path = "/demo") // This means URL's start with /demo (after Application path)
 public class ApiController {
 
     @Autowired // This means to get the bean called windTurbineRepository
@@ -28,37 +29,81 @@ public class ApiController {
     private WindTurbineRepository windTurbineRepository;
 
     @Autowired
+
+    private PhotovoltaicRepository photovoltaicRepository;
+    @Autowired
+    private TurbineServiceImpl turbineServiceImpl;
+
+    @Autowired
     private EnergyReadingRepository energyReadingRepository;
 
     public ApiController() {
     }
 
-    @PostMapping(path="/add") // Map ONLY GET Requests
-    public @ResponseBody String addNewWindTurbine (@RequestParam Float latitude
+    @PostMapping(path = "/addWind") // Map ONLY GET Requests
+    public @ResponseBody
+    String addNewWindTurbine(@RequestParam Float latitude
             , @RequestParam Float longitude, @RequestParam String name) {
         // @ResponseBody means the returned String is the response, not a view name
         // @RequestParam means it is a parameter from the GET or POST request
 
         WindTurbine n = new WindTurbine(latitude, longitude, name);
         windTurbineRepository.save(n);
-        return "Saved";
+        return "SavedWind";
     }
 
-    @GetMapping(path="/all")
-    public @ResponseBody Iterable<WindTurbine> getAllWindTurbines() {
+    @PostMapping(path = "/addVoltaic") // Map ONLY POST Requests
+    public @ResponseBody
+    String addNewPhotovoltaic(@RequestParam Float latitude
+            , @RequestParam Float longitude, @RequestParam String name) {
+        // @ResponseBody means the returned String is the response, not a view name
+        // @RequestParam means it is a parameter from the GET or POST request
+
+        Photovoltaic n = new Photovoltaic(latitude, longitude, name);
+        photovoltaicRepository.save(n);
+        return "Saved Voltaic";
+    }
+
+    @GetMapping(path = "/allWind")
+    public @ResponseBody
+    Iterable<WindTurbine> getAllWindTurbines() {
         // This returns a JSON or XML with the wind turbines
         return windTurbineRepository.findAll();
     }
 
-    @PostMapping(path="/data") // Map ONLY GET Requests
-    public @ResponseBody String addNewEnergyReading (@RequestParam String windTurbineName
+    @GetMapping(path = "/allVoltaic")
+    public @ResponseBody
+    Iterable<Photovoltaic> getAllPhotovoltaics() {
+        // This returns a JSON or XML with the wind turbines
+        return photovoltaicRepository.findAll();
+    }
+
+    @GetMapping("/test/{id}/")
+    public ResponseEntity<String> testMethod(@PathParam("id") String id,
+                                             @RequestParam("name") String name,
+                                             @RequestParam Timestamp time) {
+
+        WindTurbine windTurbine = windTurbineRepository.findAll().iterator().next();
+        EnergyReading energyReading = energyReadingRepository.findByWindTurbineAndTime(windTurbine, time).get(0);
+        String result = this.turbineServiceImpl.combine(windTurbine, energyReading);
+
+        if (windTurbine != null) {
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("", HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping(path = "/dataWind") // Map ONLY GET Requests
+    public @ResponseBody
+    String addNewEnergyReadingWind(@RequestParam String windTurbineName
             , @RequestParam Float value, @RequestParam Timestamp time) {
         // @ResponseBody means the returned String is the response, not a view name
         // @RequestParam means it is a parameter from the GET or POST request
 
         List<WindTurbine> windTurbineList = windTurbineRepository.findByName(windTurbineName);
         if (windTurbineList.isEmpty())
-            return "WindTurbine with name "+windTurbineName+" could not be found";
+            return "WindTurbine with name " + windTurbineName + " could not be found";
         WindTurbine windTurbine = windTurbineList.get(0);
 
         EnergyReading newEnergyReading = new EnergyReading(windTurbine, time, value);
@@ -71,12 +116,44 @@ public class ApiController {
             energyReadings.get(0).setValue(value);
             energyReadingRepository.save(energyReadings.get(0));
         }
-        
-        return "Saved";
+
+        return "SavedWind";
     }
 
-    @GetMapping(path="/data")
-    public @ResponseBody Iterable<EnergyReading> getAllData() {
+    @PostMapping(path = "/dataVoltaic") // Map ONLY GET Requests
+    public @ResponseBody
+    String addNewEnergyReadingPhotovoltaic(@RequestParam String photovoltaicName
+            , @RequestParam Float value, @RequestParam Timestamp time) {
+        // @ResponseBody means the returned String is the response, not a view name
+        // @RequestParam means it is a parameter from the GET or POST request
+
+        List<Photovoltaic> photoVoltaicsList = photovoltaicRepository.findByName(photovoltaicName);
+        if (photoVoltaicsList.isEmpty())
+            return "PhotoVoltaic with name " + photovoltaicName + " could not be found";
+        Photovoltaic photovoltaic = photoVoltaicsList.get(0);
+
+        EnergyReading newEnergyReading = new EnergyReading(photovoltaic, time, value);
+        // "manually" deciding whether to save or update
+        // but also take a look at the saveOrUpdate in hibernate and unsaved-value checks
+        List<EnergyReading> energyReadings = energyReadingRepository.findByPhotovoltaicAndTime(photovoltaic, time);
+        if (energyReadings.isEmpty()) {
+            energyReadingRepository.save(newEnergyReading);
+        } else {
+            energyReadings.get(0).setValue(value);
+            energyReadingRepository.save(energyReadings.get(0));
+        }
+
+        return "SavedPhotovoltaic";
+    }
+
+    @GetMapping(path = "/allWindData")
+    public @ResponseBody Iterable<EnergyReading> getAllDataWind() {
+        // This returns a JSON or XML with the energy readings
+        return energyReadingRepository.findAll();
+    }
+
+    @GetMapping(path = "/allVoltaicsData")
+    public @ResponseBody Iterable<EnergyReading> getAllDataVoltaic() {
         // This returns a JSON or XML with the energy readings
         return energyReadingRepository.findAll();
     }

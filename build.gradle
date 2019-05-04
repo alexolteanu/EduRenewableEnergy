@@ -26,12 +26,17 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 dependencies {
-    compile("org.springframework.boot:spring-boot-starter-web")
+// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.1.4.RELEASE'
     // JPA Data (We are going to use Repositories, Entities, Hibernate, etc...)
-    compile 'org.springframework.boot:spring-boot-starter-data-jpa'
+// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-jpa
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: '2.1.4.RELEASE'
     // Use MySQL Connector-J
     compile 'mysql:mysql-connector-java'
-    compile("org.springframework.boot:spring-boot-starter-thymeleaf")
-    compile("org.springframework.boot:spring-boot-devtools")
+//    compile("org.springframework.boot:spring-boot-starter-thymeleaf")
+//    compile("org.springframework.boot:spring-boot-devtools")
     testCompile("junit:junit")
+    // https://mvnrepository.com/artifact/org.javassist/javassist
+    compile group: 'org.javassist', name: 'javassist', version: '3.15.0-GA'
+
 }

@@ -12,4 +12,7 @@ public interface EnergyReadingRepository extends CrudRepository<EnergyReading, I
 
     List<EnergyReading> findByWindTurbineAndTime(WindTurbine windTurbine, Timestamp time);
 
+    List<EnergyReading> findByPhotovoltaicAndTime(Photovoltaic photovoltaic, Timestamp time);
+
+
 }
