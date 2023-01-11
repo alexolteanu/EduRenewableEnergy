@@ -33,5 +33,10 @@ dependencies {
     compile 'mysql:mysql-connector-java'
     compile("org.springframework.boot:spring-boot-starter-thymeleaf")
     compile("org.springframework.boot:spring-boot-devtools")
-    testCompile("junit:junit")
+    compile('org.javassist:javassist:3.29.2-GA')
+    testCompile('javax.xml.bind:jaxb-api:2.4.0-b180830.0359')
+    testCompile("org.springframework.boot:spring-boot-starter-test")
+    testImplementation('org.springframework.boot:spring-boot-starter-test')
+    testRuntimeOnly 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly('com.h2database:h2')
 }
